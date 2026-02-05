@@ -5,7 +5,13 @@ const InvoiceSchema = new mongoose.Schema({
   Address: String,
   MobileNo: String,
   State: String,
-  GSTIN: String
+  GSTIN: String,
+  InvoiceNo: String,
+  ChalanNo: String,
+  InvoiceDate: Date,
+  DueDate: Date,
+  PaymentTerms: String,
+  EwayBill: String,
 }, { timestamps: true });
 
 module.exports = mongoose.model('Invoice', InvoiceSchema);
