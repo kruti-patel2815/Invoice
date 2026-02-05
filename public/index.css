@@ -1,0 +1,82 @@
+.card {
+    margin-top: 50px;
+    padding: 10px 0px;
+}
+
+.card .card-header-top h3 {
+    font-weight: bold;
+}
+
+.card .card-header-top h6 {
+    font-weight: 600;
+}
+
+.card .card-header-bottom {
+    font-weight: 650;
+}
+
+.card-body {
+    flex: 1 1 auto;
+    padding: 0rem 0rem;
+}
+
+.input-group-text {
+    min-width: 120px;
+}
+
+.card>hr {
+    margin-right: 0;
+    margin-left: 0;
+    margin-bottom: 0px;
+}
+
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.invoice-table td {
+    vertical-align: top;
+    border-bottom: 1px solid #dee2e6;
+   
+}
+
+.col-7-td {
+    width: 58.33%;
+    border-right: 1px solid #dee2e6;
+    padding-top: 10px;
+}
+
+.col-3-td {
+    width: 25%;
+    border-right: 1px solid #dee2e6;
+    
+}
+
+.col-2-td {
+    width: 16.67%;
+}
+
+.col-10-td {
+    width: 83.33%;
+    border-right: 1px solid #dee2e6;
+   
+}
+
+.col-5-td {
+    width: 41.67%;
+}
+
+
+.no-bottom-border td {
+    border-bottom: none;
+}
+
+.nested-table {
+    width: 100%;
+}
+
+.bottom{
+    padding-top: 10px;
+}
+
