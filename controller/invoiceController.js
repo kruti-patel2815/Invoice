@@ -4,7 +4,7 @@ exports.create = async (req, res) => {
     try {
         const invoice = new Invoice(req.body);
         await invoice.save();
-        res.status(201).json({ message: 'Invoice created', invoice });
+        res.redirect('/');
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -43,7 +43,7 @@ exports.update = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
-exports.renderHome = (req, res) => {
+exports.Home = (req, res) => {
     res.render('index'); 
 };
 

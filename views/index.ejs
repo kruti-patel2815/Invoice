@@ -38,7 +38,9 @@
                 <h6># TAX INVOICE #</h6>
             </div>
             <hr>
-            <form action="/api/invoice/create" method="POST">
+            <form id="invoiceForm" action="/api/invoice/create" method="POST" onsubmit="return false;">
+
+
                 <div class="card-body-2">
 
                     <table class="table table-bordered mb-0">
@@ -132,42 +134,122 @@
                             </tr>
                         </thead>
                         <tbody>
+
                             <tr>
-                                <th scope="row">1</th>
-                                <td>df</td>
-                                <td>521</td>
-                                <td></td>
                                 <td>1</td>
-                                <td>0</td>
-                                <td>0</td>
-                                <td>PCS</td>
-                                <td>10</td>
-                                <td>10</td>
+
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+
+                                <td>
+                                    <input type="number" class="form-control qty" value="0"
+                                        oninput="calculateRow(this)">
+                                </td>
+
+                                <td>
+                                    <input type="number" class="form-control cut" value="0"
+                                        oninput="calculateRow(this)">
+                                </td>
+
+                                <td>
+                                    <input type="number" class="form-control mtr" value="0" readonly>
+                                </td>
+
+                                <td>
+                                    <select class="form-select unit" onchange="calculateRow(this)">
+                                        <option value="PC">PCS</option>
+                                        <option value="MTR">MTR</option>
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <input type="number" class="form-control rate" value="0"
+                                        oninput="calculateRow(this)">
+                                </td>
+
+                                <td>
+                                    <input type="number" class="form-control amount" value="0" readonly>
+                                </td>
                             </tr>
+
                             <tr>
-                                <th scope="row">2</th>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>2</td>
+
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+
+                                <td>
+                                    <input type="number" class="form-control qty" value="0"
+                                        oninput="calculateRow(this)">
+                                </td>
+
+                                <td>
+                                    <input type="number" class="form-control cut" value="0"
+                                        oninput="calculateRow(this)">
+                                </td>
+
+                                <td>
+                                    <input type="number" class="form-control mtr" value="0" readonly>
+                                </td>
+
+                                <td>
+                                    <select class="form-select unit" onchange="calculateRow(this)">
+                                        <option value="PC">PCS</option>
+                                        <option value="MTR">MTR</option>
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <input type="number" class="form-control rate" value="0"
+                                        oninput="calculateRow(this)">
+                                </td>
+
+                                <td>
+                                    <input type="number" class="form-control amount" value="0" readonly>
+                                </td>
                             </tr>
+
+
                             <tr>
-                                <th scope="row">3</th>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>3</td>
+
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+                                <td><input type="text" class="form-control"></td>
+
+                                <td>
+                                    <input type="number" class="form-control qty" value="0"
+                                        oninput="calculateRow(this)">
+                                </td>
+
+                                <td>
+                                    <input type="number" class="form-control cut" value="0"
+                                        oninput="calculateRow(this)">
+                                </td>
+
+                                <td>
+                                    <input type="number" class="form-control mtr" value="0" readonly>
+                                </td>
+
+                                <td>
+                                    <select class="form-select unit" onchange="calculateRow(this)">
+                                        <option value="PC">PCS</option>
+                                        <option value="MTR">MTR</option>
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <input type="number" class="form-control rate" value="0"
+                                        oninput="calculateRow(this)">
+                                </td>
+
+                                <td>
+                                    <input type="number" class="form-control amount" value="0" readonly>
+                                </td>
                             </tr>
+
                             <tr>
                                 <th scope="row">4</th>
                                 <td></td>
@@ -261,7 +343,8 @@
                                 <h6 class="text-start">Total</h6>
                             </td>
                             <td class="col-2-td">
-                                <h6 class="text-end">10</h6>
+                                <input type="number" id="totalAmount" class="form-control" value="0" readonly>
+
                             </td>
                         </tr>
 
@@ -402,7 +485,7 @@
                     </table>
                     <hr>
                     <button type="submit" class="btn btn-success px-5">
-                        Submit Invoice
+                        Submit
                     </button>
 
                 </div>
@@ -412,6 +495,51 @@
     </div>
 
 
+
+    <script>
+        function calculateRow(el) {
+
+            const row = el.closest("tr");
+
+            const qty = Number(row.querySelector(".qty").value) || 0;
+            const cut = Number(row.querySelector(".cut").value) || 0;
+            const rate = Number(row.querySelector(".rate").value) || 0;
+            const unit = row.querySelector(".unit").value;
+
+            const mtrInput = row.querySelector(".mtr");
+            const amountInput = row.querySelector(".amount");
+
+            let mtr = 0;
+            let amount = 0;
+
+
+            if (qty > 0 && cut > 0) {
+                mtr = qty * cut;
+            }
+            mtrInput.value = mtr;
+
+
+            if (unit === "PCS") {
+                amount = qty * rate;
+            } else {
+                amount = mtr * rate;
+            }
+
+            amountInput.value = amount;
+
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            let total = 0;
+
+            document.querySelectorAll(".amount").forEach(input => {
+                total += Number(input.value) || 0;
+            });
+
+            document.getElementById("totalAmount").value = total;
+        }
+    </script>
 
 
 

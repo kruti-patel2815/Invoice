@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const InvoiceSchema = new mongoose.Schema({
   Name: String,
   Address: String,
-  MobileNo: String,
+  MobileNo: Number,
   State: String,
   GSTIN: String,
   InvoiceNo: String,

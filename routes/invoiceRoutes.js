@@ -6,7 +6,7 @@ router.post('/create', invoiceController.create);
 router.get('/', invoiceController.get);
 router.delete('/:id', invoiceController.delete);
 router.patch('/:id', invoiceController.update);
-router.get('/page', invoiceController.renderHome);
+router.get('/page', invoiceController.Home);
 
 
 module.exports = router;
