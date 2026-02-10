@@ -129,13 +129,17 @@
                                 <th scope="col">MTR</th>
                                 <th scope="col">Qty Unit</th>
                                 <th scope="col">Rate</th>
-                                <th scope="col">Amount</th>
+                                <th scope="col">Amount
+                                    <button type="button" class="btn btn-sm btn-primary mt-1"
+                                        onclick="addRow()">+</button>
+                                </th>
 
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="invoiceBody">
 
-                            <tr>
+
+                            <!-- <tr>
                                 <td>1</td>
 
                                 <td><input type="text" class="form-control"></td>
@@ -158,9 +162,10 @@
 
                                 <td>
                                     <select class="form-select unit" onchange="calculateRow(this)">
-                                        <option value="PC">PCS</option>
+                                        <option value="PCS">PCS</option>
                                         <option value="MTR">MTR</option>
                                     </select>
+
                                 </td>
 
                                 <td>
@@ -196,7 +201,7 @@
 
                                 <td>
                                     <select class="form-select unit" onchange="calculateRow(this)">
-                                        <option value="PC">PCS</option>
+                                        <option value="PCS">PCS</option>
                                         <option value="MTR">MTR</option>
                                     </select>
                                 </td>
@@ -235,7 +240,7 @@
 
                                 <td>
                                     <select class="form-select unit" onchange="calculateRow(this)">
-                                        <option value="PC">PCS</option>
+                                        <option value="PCS">PCS</option>
                                         <option value="MTR">MTR</option>
                                     </select>
                                 </td>
@@ -247,6 +252,8 @@
 
                                 <td>
                                     <input type="number" class="form-control amount" value="0" readonly>
+                                    <button type="button" class="btn btn-sm btn-primary mt-1"
+                                        onclick="addRow(this)">+</button>
                                 </td>
                             </tr>
 
@@ -333,7 +340,7 @@
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                            </tr>
+                            </tr> -->
                         </tbody>
                     </table>
                     <table class="invoice-table">
@@ -370,7 +377,7 @@
                                 <h6>Taxable Value</h6>
                             </td>
                             <td class="col-2-td text-start">
-                                <h6>10</h6>
+                                <input type="number" id="taxableValue" readonly>
                             </td>
                         </tr>
 
@@ -445,7 +452,7 @@
 
                                     <tr>
                                         <td>
-                                            <h6>10.5</h6>
+                                            <input type="number" id="invoiceTotalbefore" readonly>
                                         </td>
                                     </tr>
 
@@ -457,7 +464,7 @@
 
                                     <tr>
                                         <td>
-                                            <h6>11</h6>
+                                            <input type="number" id="invoiceTotalafter" readonly>
                                         </td>
                                     </tr>
                                 </table>
@@ -538,8 +545,61 @@
             });
 
             document.getElementById("totalAmount").value = total;
+
+            document.getElementById("taxableValue").value = total;
+
+            document.getElementById("invoiceTotalbefore").value = total;
+
         }
+        function addRow() {
+            const tbody = document.getElementById("invoiceBody");
+            const rowCount = tbody.rows.length + 1;
+
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `<td>${rowCount}</td>
+        <td><input type="text" class="form-control"></td>
+        <td><input type="text" class="form-control"></td>
+        <td><input type="text" class="form-control"></td>
+
+        <td>
+            <input type="number" class="form-control qty"
+                oninput="calculateRow(this)">
+        </td>
+
+        <td>
+            <input type="number" class="form-control cut"
+                oninput="calculateRow(this)">
+        </td>
+
+        <td>
+            <input type="number" class="form-control mtr" readonly>
+        </td>
+
+        <td>
+            <select class="form-select unit"
+                onchange="calculateRow(this)">
+                <option value="PCS">PCS</option>
+                <option value="MTR">MTR</option>
+            </select>
+        </td>
+
+        <td>
+            <input type="number" class="form-control rate"
+                oninput="calculateRow(this)">
+        </td>
+
+        <td>
+            <input type="number" class="form-control amount" readonly>
+        </td>
+    `;
+
+            tbody.appendChild(tr);
+        }
+
     </script>
+
+
 
 
 
