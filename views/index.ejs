@@ -139,7 +139,7 @@
                         <tbody id="invoiceBody">
 
 
-                            <!-- <tr>
+                            <tr>
                                 <td>1</td>
 
                                 <td><input type="text" class="form-control"></td>
@@ -178,7 +178,7 @@
                                 </td>
                             </tr>
 
-                            <tr>
+                            <!-- <tr>
                                 <td>2</td>
 
                                 <td><input type="text" class="form-control"></td>
@@ -538,6 +538,7 @@
         }
 
         function calculateTotal() {
+
             let total = 0;
 
             document.querySelectorAll(".amount").forEach(input => {
@@ -545,12 +546,18 @@
             });
 
             document.getElementById("totalAmount").value = total;
-
             document.getElementById("taxableValue").value = total;
 
-            document.getElementById("invoiceTotalbefore").value = total;
+            let IGST = 0.5;
+            let afterTax = total + IGST;
+            document.getElementById("invoiceTotalbefore").value = afterTax;
 
+            let roundedTotal = Math.round(afterTax);
+            let roundOff = roundedTotal - afterTax;
+            document.getElementById("invoiceTotalbefore").value = afterTax;
+            document.getElementById("invoiceTotalafter").value = roundedTotal;
         }
+
         function addRow() {
             const tbody = document.getElementById("invoiceBody");
             const rowCount = tbody.rows.length + 1;
