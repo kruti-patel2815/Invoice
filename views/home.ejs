@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Home</title>
+</head>
+
+<body style="display:flex; justify-content:center; align-items:center; height:100vh;">
+
+    <form action="/invoice" method="GET">
+        <button type="submit" style="padding:15px 30px; font-size:18px;">
+            Open Invoice
+        </button>
+
+        <table border="1">
+            <tr>
+                <th>Name</th>
+                <th>Address</th>
+                <th>MobileNo</th>
+                <th>State</th>
+                <th>Desc</th>
+                <th>DesignNo</th>
+                <th>Qty</th>
+                <th>Cut</th>
+                <th>MTR</th>
+                <th>Unit</th>
+                <th>Rate</th>
+                <th>Amount</th>
+                <th>totalAmount</th>
+                <th>discount</th>
+                <th>taxableValue</th>
+                <th>CGST</th>
+                <th>SGST</th>
+                <th>IGST</th>
+                <th>invoiceTotalAfter</th>
+                <th>amountWords</th>
+            </tr>
+
+            <% if (invoices && invoices.length> 0) { %>
+                <% invoices.forEach(function(inv) { %>
+                    <% inv.items.forEach(function(item) { %>
+                        <tr>
+                            <td>
+                                <%= inv.Name %>
+                            </td>
+                            <td>
+                                <%= inv.Address %>
+                            </td>
+                            <td>
+                                <%= inv.MobileNo %>
+                            </td>
+                            <td>
+                                <%= inv.State %>
+                            </td>
+                            <td>
+                                <%= item.Desc %>
+                            </td>
+                            <td>
+                                <%= item.DesignNo %>
+                            </td>
+                            <td>
+                                <%= item.Qty %>
+                            </td>
+                            <td>
+                                <%= item.Cut %>
+                            </td>
+                            <td>
+                                <%= item.MTR %>
+                            </td>
+                            <td>
+                                <%= item.Unit %>
+                            </td>
+                            <td>
+                                <%= item.Rate %>
+                            </td>
+                            <td>
+                                <%= item.Amount %>
+                            </td>
+                            <td>
+                                <%= inv.totalAmount %>
+                            </td>
+                            <td>
+                                <%= inv.discount %>
+                            </td>
+                            <td>
+                                <%= inv.taxableValue %>
+                            </td>
+                            <td>
+                                <%= inv.CGST %>
+                            </td>
+                            <td>
+                                <%= inv.SGST %>
+                            </td>
+                            <td>
+                                <%= inv.IGST %>
+                            </td>
+                            <td>
+                                <%= inv.invoiceTotalAfter %>
+                            </td>
+                            <td>
+                                <%= inv.amountWords %>
+                            </td>
+                        </tr>
+                        <% }); %>
+                            <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="20" style="text-align: center;">No invoices found</td>
+                                    </tr>
+                                    <% } %>
+        </table>
+    </form>
+</body>
+
+</html>
