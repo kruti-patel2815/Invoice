@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Items</title>
+</head>
+<body>
+
+    <a href="/">← Back to Home</a>
+    
+
+    
+    <table border="1" cellpadding="5">
+        <tr bgcolor="#f0f0f0">
+            <th>Description</th>
+            <th>Design No.</th>
+            <th>Qty</th>
+            <th>Cut</th>
+            <th>MTR</th>
+            <th>Unit</th>
+            <th>Rate</th>
+            <th>Amount</th>
+        </tr>
+        
+        <% if (invoice.items.length === 0) { %>
+            <tr>
+                <td colspan="8" style="text-align:center;">No items</td>
+            </tr>
+        <% } else { %>
+            <% for (var i = 0; i < invoice.items.length; i++) { 
+                var item = invoice.items[i];
+            %>
+                <tr>
+                    <td><%= item.Desc || '-' %></td>
+                    <td><%= item.DesignNo || '-' %></td>
+                    <td><%= item.Qty || '0' %></td>
+                    <td><%= item.Cut || '0' %></td>
+                    <td><%= item.MTR || '0' %></td>
+                    <td><%= item.Unit || '-' %></td>
+                    <td><%= item.Rate || '0' %></td>
+                    <td><%= item.Amount || '0' %></td>
+                </tr>
+            <% } %>
+        <% } %>
+    </table>
+    
+</body>
+</html>

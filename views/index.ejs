@@ -144,13 +144,15 @@
                                 <td><input type="number" name="items[0][Cut]" class="form-control cut" value="0"
                                         oninput="calculateRow(this)"></td>
 
-                                <td><input type="number" name="items[0][MTR]" class="form-control mtr" value="0"></td>
+                                <td><input type="number" name="items[0][MTR]" class="form-control mtr" value="0"
+                                        oninput="calculateRow(this)"></td>
 
                                 <td>
                                     <select name="items[0][Unit]" class="form-select unit"
                                         onchange="calculateRow(this)">
                                         <option value="PCS">PCS</option>
                                         <option value="MTR">MTR</option>
+                                        <option value="CUT">CUT</option>
                                     </select>
                                 </td>
 
@@ -276,29 +278,34 @@
 
         function calculateRow(element) {
 
-            const row = element.closest("tr");
+            var row = element.closest("tr");
 
-            const qty = Number(row.querySelector(".qty").value) || 0;
-            const cut = Number(row.querySelector(".cut").value) || 0;
-            const rate = Number(row.querySelector(".rate").value) || 0;
-            const unit = row.querySelector(".unit").value;
+            var qty = Number(row.querySelector(".qty").value) || 0;
+            var cut = Number(row.querySelector(".cut").value) || 0;
+            var mtr = Number(row.querySelector(".mtr").value) || 0;
+            var rate = Number(row.querySelector(".rate").value) || 0;
+            var unit = row.querySelector(".unit").value;
 
-            const mtrInput = row.querySelector(".mtr");
-            const amountInput = row.querySelector(".amount");
+            var amountInput = row.querySelector(".amount");
 
-            let mtr = 0;
-            let amount = 0;
+            var amount = 0;
 
-            if (qty > 0 && cut > 0) {
-                mtr = qty * cut;
-            }
+            switch (unit) {
 
-            mtrInput.value = mtr;
+                case "PCS":
+                    amount = qty * rate;
+                    break;
 
-            if (unit === "PCS") {
-                amount = qty * rate;
-            } else {
-                amount = mtr * rate;
+                case "MTR":
+                    amount = mtr * rate;
+                    break;
+
+                case "CUT":
+                    amount = cut * rate;
+                    break;
+
+                default:
+                    amount = 0;
             }
 
             amountInput.value = amount;
@@ -307,37 +314,48 @@
         }
 
 
+
+
         function calculateTotal() {
 
-            let total = 0;
+            var total = 0;
 
-            document.querySelectorAll(".amount").forEach(input => {
-                total += Number(input.value) || 0;
+            var amounts = document.querySelectorAll(".amount");
+
+            amounts.forEach(function (input) {
+                total = total + (Number(input.value) || 0);
             });
 
             document.getElementById("totalAmount").value = total;
 
-            let discount = Number(document.getElementById("discount").value) || 0;
-            let taxable = total - discount;
+            var discountPercent = Number(document.getElementById("discount").value) || 0;
+
+            var discountValue = (total * discountPercent) / 100;
+
+            var taxable = total - discountValue;
 
             document.getElementById("taxableValue").value = taxable;
 
-            let CGST = Number(document.getElementById("CGST").value) || 0;
-            let SGST = Number(document.getElementById("SGST").value) || 0;
-            let IGST = Number(document.getElementById("IGST").value) || 0;
+            var cgstPercent = Number(document.getElementById("CGST").value) || 0;
+            var sgstPercent = Number(document.getElementById("SGST").value) || 0;
+            var igstPercent = Number(document.getElementById("IGST").value) || 0;
 
-            let totalTax = CGST + SGST + IGST;
+            var cgstValue = (taxable * cgstPercent) / 100;
+            var sgstValue = (taxable * sgstPercent) / 100;
+            var igstValue = (taxable * igstPercent) / 100;
 
-            let afterTax = taxable + totalTax;
+            var finalTotal = taxable + cgstValue + sgstValue + igstValue;
 
-            document.getElementById("invoiceTotalbefore").value = afterTax;
+            document.getElementById("invoiceTotalbefore").value = finalTotal;
 
-            let roundedTotal = Math.round(afterTax);
-            document.getElementById("invoiceTotalafter").value = roundedTotal;
+            var rounded = Math.round(finalTotal);
+
+            document.getElementById("invoiceTotalafter").value = rounded;
 
             document.getElementById("amountWords").innerText =
-                numberToWords(roundedTotal) + " Rupees Only";
+                numberToWords(rounded) + " Rupees Only";
         }
+
 
 
         function handleGST(type) {
@@ -358,72 +376,107 @@
 
         function numberToWords(num) {
 
-            let ones = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
-            let teens = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
-            let tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+            var ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
+            var teens = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen",
+                "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+            var tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty",
+                "Sixty", "Seventy", "Eighty", "Ninety"];
 
-            let word = "";
+            if (num === 0) return "Zero";
 
-            if (num < 10) {
-                word = ones[num];
+            function twoDigit(n) {
+                if (n < 10) return ones[n];
+                if (n < 20) return teens[n - 10];
+                return tens[Math.floor(n / 10)] + " " + ones[n % 10];
             }
-            else if (num < 20) {
-                word = teens[num - 10];
+
+            function threeDigit(n) {
+                if (n < 100) return twoDigit(n);
+                return ones[Math.floor(n / 100)] + " Hundred " + twoDigit(n % 100);
             }
-            else if (num < 100) {
-                word = tens[Math.floor(num / 10)] + " " + ones[num % 10];
+
+            var word = "";
+
+            if (num >= 100000) {
+                word += threeDigit(Math.floor(num / 100000)) + " Lakh ";
+                num = num % 100000;
             }
-            else if (num < 1000) {
-                word = ones[Math.floor(num / 100)] + " Hundred " + numberToWords(num % 100);
+
+            if (num >= 1000) {
+                word += threeDigit(Math.floor(num / 1000)) + " Thousand ";
+                num = num % 1000;
             }
-            else if (num < 10000) {
-                word = ones[Math.floor(num / 1000)] + " Thousand " + numberToWords(num % 1000);
+
+            if (num > 0) {
+                word += threeDigit(num);
             }
 
             return word.trim();
         }
 
 
+
         function addRow() {
 
             const tbody = document.getElementById("invoiceBody");
-            const rowCount = tbody.rows.length + 1;
+
+
+            const rowCount = tbody.rows.length;
 
             const tr = document.createElement("tr");
 
             tr.innerHTML = `
-        <td>${rowCount}</td>
-        <td><input type="text" name="items[0][Desc]" class="form-control"></td>
+        <td>${rowCount + 1}</td>
 
-        <td><input type="text" name="items[0][DesignNo]" class="form-control"></td>
+        <td><input type="text" name="items[${rowCount}][Desc]" class="form-control"></td>
 
-        <td><input type="text" name="items[0][HSN]" class="form-control"></td>
+        <td><input type="text" name="items[${rowCount}][DesignNo]" class="form-control"></td>
 
-        <td><input type="number" name="items[0][Qty]" class="form-control qty" value="0"
-                                        oninput="calculateRow(this)"></td>
-
-        <td><input type="number" name="items[0][Cut]" class="form-control cut" value="0"
-                                        oninput="calculateRow(this)"></td>
-
-        <td><input type="number" name="items[0][MTR]" class="form-control mtr" value="0"></td>
+        <td><input type="text" name="items[${rowCount}][HSN]" class="form-control"></td>
 
         <td>
-            <select name="items[0][Unit]" class="form-select unit"
+            <input type="number" name="items[${rowCount}][Qty]" 
+                class="form-control qty" value="0"
+                oninput="calculateRow(this)">
+        </td>
+
+        <td>
+            <input type="number" name="items[${rowCount}][Cut]" 
+                class="form-control cut" value="0"
+                oninput="calculateRow(this)">
+        </td>
+
+        <td>
+            <input type="number" name="items[${rowCount}][MTR]" 
+                class="form-control mtr" value="0">
+        </td>
+
+        <td>
+            <select name="items[${rowCount}][Unit]" 
+                class="form-select unit"
                 onchange="calculateRow(this)">
                 <option value="PCS">PCS</option>
                 <option value="MTR">MTR</option>
+                <option value="CUT">CUT</option>
             </select>
         </td>
 
-        <td><input type="number" name="items[0][Rate]" class="form-control rate" value="0"
-            oninput="calculateRow(this)"></td>
+        <td>
+            <input type="number" name="items[${rowCount}][Rate]" 
+                class="form-control rate" value="0"
+                oninput="calculateRow(this)">
+        </td>
 
-        <td><input type="number" name="items[0][Amount]" class="form-control amount" value="0"
-                                        readonly></td>
-        `;
+        <td>
+            <input type="number" name="items[${rowCount}][Amount]" 
+                class="form-control amount" value="0"
+                readonly>
+        </td>
+    `;
 
             tbody.appendChild(tr);
         }
+
 
     </script>
 

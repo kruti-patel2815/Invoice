@@ -30,18 +30,18 @@ app.listen(PORT, () => {
 });
 
 app.get("/", async (req, res) => {
-    const invoices = await Invoice.find().sort({ createdAt: -1 });
-    res.render("home", { invoices });
+  const invoices = await Invoice.find().sort({ createdAt: -1 });
+  res.render("home", { invoices });
 });
 
 app.post("/invoice", async (req, res) => {
-    try {
-        const invoice = new Invoice(req.body);
-        await invoice.save();
-        res.redirect("/");
-    } catch (err) {
-        console.log(err);
-    }
+  try {
+    const invoice = new Invoice(req.body);
+    await invoice.save();
+    res.redirect("/");
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 app.get("/invoice", (req, res) => {
@@ -49,3 +49,19 @@ app.get("/invoice", (req, res) => {
 });
 
 
+app.get('/items/:id', async function(req, res) {
+    try {
+        var id = req.params.id;
+      
+        var invoice = await Invoice.findById(id);
+        
+        if (invoice) {
+            res.render('items', { invoice: invoice });
+        } else {
+            res.send("Invoice not found");
+        }
+    } catch (error) {
+        console.log(error);
+        res.send("Error loading invoice");
+    }
+});
