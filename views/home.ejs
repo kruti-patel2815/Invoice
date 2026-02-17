@@ -12,7 +12,7 @@
     </form>
 
     <br>
-    <hr>
+ 
 
     <% if (!invoices || invoices.length===0) { %>
         <p><b>No invoices found.</b></p>
@@ -21,8 +21,10 @@
             <table border="1" cellpadding="8" cellspacing="0">
                 <tr bgcolor="#f0f0f0">
                     <th>Name</th>
-                    <th>Mobile</th>
-                    <th>Total Amount</th>
+                    <th>Address</th>
+                    <th>MobileNo</th>
+                    <th>State</th>
+                    <th>Total</th>
                     <th>Invoice Total</th>
                     <th>Action</th>
                 </tr>
@@ -33,7 +35,13 @@
                             <%= invoices[i].Name %>
                         </td>
                         <td>
+                            <%= invoices[i].Address %>
+                        </td>
+                        <td>
                             <%= invoices[i].MobileNo %>
+                        </td>
+                        <td>
+                            <%= invoices[i].State %>
                         </td>
                         <td>
                             <%= invoices[i].totalAmount %>
