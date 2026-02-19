@@ -29,9 +29,8 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-app.get("/", async (req, res) => {
-  const invoices = await Invoice.find().sort({ createdAt: -1 });
-  res.render("home", { invoices });
+app.get("/invoice", function (req, res) {
+  res.render("index");
 });
 
 app.post("/invoice", async (req, res) => {
@@ -43,25 +42,37 @@ app.post("/invoice", async (req, res) => {
     console.log(err);
   }
 });
-
-app.get("/invoice", (req, res) => {
-  res.render("index");
+app.get("/", async (req, res) => {
+  const invoices = await Invoice.find().sort({ createdAt: -1 });
+  res.render("home", { invoices });
 });
 
-
-app.get('/items/:id', async function(req, res) {
-    try {
-        var id = req.params.id;
-      
-        var invoice = await Invoice.findById(id);
-        
-        if (invoice) {
-            res.render('items', { invoice: invoice });
-        } else {
-            res.send("Invoice not found");
-        }
-    } catch (error) {
-        console.log(error);
-        res.send("Error loading invoice");
+// Get single invoice by ID (items માટે)
+app.get('/api/invoice/:id', async (req, res) => {
+  try {
+    const invoice = await Invoice.findById(req.params.id);
+    if (!invoice) {
+      return res.status(404).json({ error: 'Invoice not found' });
     }
+    res.json(invoice);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/items/:id', async function (req, res) {
+  try {
+    var id = req.params.id;
+
+    var invoice = await Invoice.findById(id);
+
+    if (invoice) {
+      res.render('items', { invoice: invoice });
+    } else {
+      res.send("Invoice not found");
+    }
+  } catch (error) {
+    console.log(error);
+    res.send("Error loading invoice");
+  }
 });
