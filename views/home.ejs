@@ -21,16 +21,21 @@
                 <table class="table table-bordered">
                     <tr>
                         <th>Name</th>
-                        <th>Mobile</th>
+                        <th>Address</th>
+                        <th>MobileNo</th>
                         <th>Total</th>
-                        <th>Final</th>
+                        <th>Invoice total</th>
                         <th>Action</th>
+                        <th>Edit</th>
                     </tr>
 
                     <% for (var i=0; i < invoices.length; i++) { %>
                         <tr>
                             <td>
                                 <%= invoices[i].Name %>
+                            </td>
+                            <td>
+                                <%= invoices[i].Address %>
                             </td>
                             <td>
                                 <%= invoices[i].MobileNo %>
@@ -46,6 +51,11 @@
                                     View Items
                                 </button>
                             </td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" onclick="editInvoice('<%= invoices[i]._id %>')">
+                                    Edit
+                                </button>
+                            </td>
                         </tr>
                         <% } %>
                 </table>
@@ -58,7 +68,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title">Create Invoice</h5>
+
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 
@@ -560,19 +570,35 @@
         </div>
     </div>
 
+
     <div class="modal fade" id="itemsModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-
                 <div class="modal-header">
-                    <h5 class="modal-title">Invoice Items</h5>
+
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-
-                <div class="modal-body" id="itemsTableContainer">
-
+                <div class="modal-body">
+                    <table class="table table-bordered" id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Design No.</th>
+                                <th>Qty</th>
+                                <th>Cut</th>
+                                <th>MTR</th>
+                                <th>Unit</th>
+                                <th>Rate</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody">
+                            <tr>
+                                <td colspan="8" class="text-center"></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-
             </div>
         </div>
     </div>
@@ -580,42 +606,151 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        function openItems(invoiceId) {
+        function editInvoice(invoiceId) {
+            if (!invoiceId) {
           
+                alert('Invoice ID not found');
+                return;
+            }
+            fetch('/api/invoice/' + invoiceId)
+                .then(response => {
+                   
+                    if (!response.ok) {
+                        throw new Error('HTTP error! status: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(invoice => {
+
+                    let nameInput = document.querySelector('input[name="Name"]');
+                    if (!nameInput) {
+                        console.error('6. Name input field not found!');
+                        alert('Form elements not found!');
+                        return;
+                    }
+
+                    nameInput.value = invoice.Name || '';
+                    document.querySelector('input[name="Address"]').value = invoice.Address || '';
+                    document.querySelector('input[name="MobileNo"]').value = invoice.MobileNo || '';
+                    document.querySelector('input[name="State"]').value = invoice.State || '';
+                    document.querySelector('input[name="GSTIN"]').value = invoice.GSTIN || '';
+
+                    document.querySelector('input[name="InvoiceNo"]').value = invoice.InvoiceNo || '';
+                    document.querySelector('input[name="ChalanNo"]').value = invoice.ChalanNo || '';
+                    document.querySelector('input[name="InvoiceDate"]').value = invoice.InvoiceDate || '';
+                    document.querySelector('input[name="DueDate"]').value = invoice.DueDate || '';
+                    document.querySelector('input[name="PaymentTerms"]').value = invoice.PaymentTerms || '';
+                    document.querySelector('input[name="EwayBill"]').value = invoice.EwayBill || '';
+
+                    let tbody = document.getElementById('invoiceBody');
+                    if (tbody) {
+                        tbody.innerHTML = '';
+
+                        if (invoice.items && invoice.items.length > 0) {
+                            invoice.items.forEach((item, index) => {
+                                addRowWithData(item, index);
+                            });
+                        } else {
+                            addRow();
+                        }
+                    }
+
+                    document.getElementById('discount').value = invoice.discount || 0;
+                    document.getElementById('CGST').value = invoice.CGST || 0;
+                    document.getElementById('SGST').value = invoice.SGST || 0;
+                    document.getElementById('IGST').value = invoice.IGST || 0;
+
+                    if (typeof calculateTotal === 'function') {
+                        calculateTotal();
+                    }
+
+                    let form = document.getElementById('invoiceForm');
+                    if (form) {
+                        form.action = '/api/invoice/update/' + invoiceId;
+                    }
+
+                    let modalTitle = document.querySelector('#invoiceModal .modal-title');
+                    if (modalTitle) {
+                        modalTitle.textContent = 'Edit Invoice';
+                    }
+                    console.log('7. Showing modal');
+                    var modal = new bootstrap.Modal(document.getElementById('invoiceModal'));
+                    modal.show();
+                })
+                .catch(error => {
+                    console.error('8. Error:', error);
+                    alert('Error loading invoice: ' + error.message);
+                });
+        }
+        function addRowWithData(item, index) {
+            const tbody = document.getElementById('invoiceBody');
+            const tr = document.createElement('tr');
+
+            tr.innerHTML = `
+            <td>${index + 1}</td>
+            <td><input type="text" name="items[${index}][Desc]" class="form-control" value="${item.Desc ? item.Desc.replace(/"/g, '&quot;') : ''}"></td>
+            <td><input type="text" name="items[${index}][DesignNo]" class="form-control" value="${item.DesignNo || ''}"></td>
+            <td><input type="text" name="items[${index}][HSN]" class="form-control" value="${item.HSN || ''}"></td>
+            <td><input type="number" name="items[${index}][Qty]" class="form-control qty" value="${item.Qty || 0}" oninput="calculateRow(this)"></td>
+            <td><input type="number" name="items[${index}][Cut]" class="form-control cut" value="${item.Cut || 0}" oninput="calculateRow(this)"></td>
+            <td><input type="number" name="items[${index}][MTR]" class="form-control mtr" value="${item.MTR || 0}" oninput="calculateRow(this)"></td>
+            <td>
+                <select name="items[${index}][Unit]" class="form-select unit" onchange="calculateRow(this)">
+                    <option value="PCS" ${item.Unit === 'PCS' ? 'selected' : ''}>PCS</option>
+                    <option value="MTR" ${item.Unit === 'MTR' ? 'selected' : ''}>MTR</option>
+                    <option value="CUT" ${item.Unit === 'CUT' ? 'selected' : ''}>CUT</option>
+                </select>
+            </td>
+            <td><input type="number" name="items[${index}][Rate]" class="form-control rate" value="${item.Rate || 0}" oninput="calculateRow(this)"></td>
+            <td><input type="number" name="items[${index}][Amount]" class="form-control amount" value="${item.Amount || 0}" readonly></td>
+        `;
+
+            tbody.appendChild(tr);
+        }
+
+        function openItems(invoiceId) {
+
             fetch('/api/invoice/' + invoiceId)
                 .then(response => response.json())
                 .then(invoice => {
-                    let html = '';
+                    let tbody = document.getElementById('itemsTableBody');
+                    tbody.innerHTML = '';
 
                     if (!invoice.items || invoice.items.length === 0) {
-                        html = '<tr><td colspan="8" style="text-align:center;">No items</td></tr>';
+                        let row = tbody.insertRow();
+                        let cell = row.insertCell();
+                        cell.colSpan = 8;
+                        cell.className = 'text-center';
+                        cell.textContent = 'No items';
                     } else {
                         invoice.items.forEach(item => {
-                            html += '<tr>';
-                            html += '<td>' + (item.Desc || '-') + '</td>';
-                            html += '<td>' + (item.DesignNo || '-') + '</td>';
-                            html += '<td>' + (item.Qty || '0') + '</td>';
-                            html += '<td>' + (item.Cut || '0') + '</td>';
-                            html += '<td>' + (item.MTR || '0') + '</td>';
-                            html += '<td>' + (item.Unit || '-') + '</td>';
-                            html += '<td>' + (item.Rate || '0') + '</td>';
-                            html += '<td>' + (item.Amount || '0') + '</td>';
-                            html += '</tr>';
+                            let row = tbody.insertRow();
+
+                            let cells = [
+                                item.Desc || '-',
+                                item.DesignNo || '-',
+                                item.Qty || '0',
+                                item.Cut || '0',
+                                item.MTR || '0',
+                                item.Unit || '-',
+                                item.Rate || '0',
+                                item.Amount || '0'
+                            ];
+
+                            cells.forEach(text => {
+                                let cell = row.insertCell();
+                                cell.textContent = text;
+                            });
                         });
                     }
-
-                    document.getElementById('itemsTableContainer').innerHTML =
-                        '<table border="1" width="100%">' +
-                        '<tr><th>Description</th><th>Design No.</th><th>Qty</th><th>Cut</th><th>MTR</th><th>Unit</th><th>Rate</th><th>Amount</th></tr>' +
-                        html +
-                        '</table>';
 
                     var modal = new bootstrap.Modal(document.getElementById('itemsModal'));
                     modal.show();
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Error loading items');
+                    document.getElementById('itemsTableBody').innerHTML =
+                        '<tr><td colspan="8" class="text-center text-danger">Error loading items</td></tr>';
                 });
         }
     </script>

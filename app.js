@@ -47,17 +47,22 @@ app.get("/", async (req, res) => {
   res.render("home", { invoices });
 });
 
-// Get single invoice by ID (items માટે)
+
 app.get('/api/invoice/:id', async (req, res) => {
-  try {
-    const invoice = await Invoice.findById(req.params.id);
-    if (!invoice) {
-      return res.status(404).json({ error: 'Invoice not found' });
+    console.log('API called with ID:', req.params.id); // આ terminal માં બતાવશે
+    
+    try {
+        const invoice = await Invoice.findById(req.params.id);
+        console.log('Invoice found:', invoice ? 'Yes' : 'No');
+        
+        if (!invoice) {
+            return res.status(404).json({ error: 'Invoice not found' });
+        }
+        res.json(invoice);
+    } catch (error) {
+        console.error('API Error:', error);
+        res.status(500).json({ error: error.message });
     }
-    res.json(invoice);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
 });
 
 app.get('/items/:id', async function (req, res) {
@@ -74,5 +79,18 @@ app.get('/items/:id', async function (req, res) {
   } catch (error) {
     console.log(error);
     res.send("Error loading invoice");
+  }
+});
+app.post('/api/invoice/update/:id', async (req, res) => {
+  try {
+    const updatedInvoice = await Invoice.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.redirect('/');
+  } catch (error) {
+    console.error('Update error:', error);
+    res.status(500).json({ error: error.message });
   }
 });
