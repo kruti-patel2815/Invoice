@@ -49,20 +49,20 @@ app.get("/", async (req, res) => {
 
 
 app.get('/api/invoice/:id', async (req, res) => {
-    console.log('API called with ID:', req.params.id); // આ terminal માં બતાવશે
-    
-    try {
-        const invoice = await Invoice.findById(req.params.id);
-        console.log('Invoice found:', invoice ? 'Yes' : 'No');
-        
-        if (!invoice) {
-            return res.status(404).json({ error: 'Invoice not found' });
-        }
-        res.json(invoice);
-    } catch (error) {
-        console.error('API Error:', error);
-        res.status(500).json({ error: error.message });
+
+
+  try {
+    const invoice = await Invoice.findById(req.params.id);
+
+
+    if (!invoice) {
+      return res.status(404).json({ error: 'Invoice not found' });
     }
+    res.json(invoice);
+  } catch (error) {
+
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.get('/items/:id', async function (req, res) {
@@ -90,7 +90,16 @@ app.post('/api/invoice/update/:id', async (req, res) => {
     );
     res.redirect('/');
   } catch (error) {
-    console.error('Update error:', error);
+
     res.status(500).json({ error: error.message });
+  }
+});
+app.delete('/api/invoice/delete/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    await Invoice.findByIdAndDelete(id);
+    res.json({ message: "Invoice deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Error deleting invoice" });
   }
 });
